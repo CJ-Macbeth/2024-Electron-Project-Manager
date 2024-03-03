@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "electron": "^29.1.0",
+    "open": "^10.0.4"
+  },
+  "name": "2024-electron-project-manager",
+  "description": "A simple Electron-based project manager. Projects made in this program are composed of infinitely nestable checklist nodes that represent individual tasks, subtasks, or subprojects, which can be associated with due dates or periodicities.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CJ-Macbeth/2024-Electron-Project-Manager.git"
+  },
+  "author": "CJ Macbeth",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/CJ-Macbeth/2024-Electron-Project-Manager/issues"
+  },
+  "homepage": "https://github.com/CJ-Macbeth/2024-Electron-Project-Manager#readme"
+}

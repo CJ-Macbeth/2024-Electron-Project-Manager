@@ -63,6 +63,7 @@ const MGUI = function (Workspace) {
 	action.appendChild(keybinds);
 	this.Escape = action;
 	this.Sensing = true;
+	this.Suspended = false;
 	document.addEventListener('keydown', E => this.Eye(E));
 	document.addEventListener('keyup', E => this.Ear(E));
 }
@@ -84,6 +85,7 @@ MGUI.prototype.Mouth = async function (Element) {
 	}
 }
 MGUI.prototype.Eye = function (E) {
+	if (this.Suspended) this.Suspended = false;
 	if (!this.Sensing) return;
 	E.stopPropagation();
 	let Key = (E.key.length > 1) ? E.key : E.key.toLowerCase();
@@ -92,7 +94,6 @@ MGUI.prototype.Eye = function (E) {
 	if (Key == 'Alt' || Key == 'Control') this.Submenu(State);
 }
 MGUI.prototype.Ear = async function (E) {
-	if (!this.Sensing) return;
 	E.stopPropagation();
 	let Key = (E.key.length > 1) ? E.key : E.key.toLowerCase();
 	if (Key == 'Shift' || Key == 'Tab') return;
@@ -100,6 +101,7 @@ MGUI.prototype.Ear = async function (E) {
 	let State = 0 + (E.altKey ? 1 : 0) + (E.ctrlKey ? 2 : 0);
 	if (Key == 'Escape' && this.Escape.parentElement == this.Workspace) this.Escape.Function();
 	else if (Key == 'Alt' || Key == 'Control') this.Submenu(State);
+	else if (!this.Sensing || this.Suspended) return;
 	else if(this.Chain.length > 0 && Key in this.Chain[this.Chain.length - 1][State]) this.Mouth(this.Chain[this.Chain.length - 1][State][Key]);
 }
 MGUI.prototype.Sense = function (Setting) {
@@ -115,6 +117,7 @@ MGUI.prototype.Relocate = function (Workspace) {
 	return true;
 }
 MGUI.prototype.Navigate = function (Menu, Reset) {
+	this.Suspended = true;
 	if (Menu === false) {
 		Menu = this.Chain.pop();
 		delete Menu.Parent;
@@ -128,6 +131,7 @@ MGUI.prototype.Navigate = function (Menu, Reset) {
 	return this.Submenu(0);
 }
 MGUI.prototype.Submenu = function (State, Bind) {
+	if (!Bind) Bind = false;
 	if (this.Chain.length == 0 || !Number.isInteger(State) || State < 0 || State > 3) return false;
 	let Menu = this.Chain[this.Chain.length-1];
 	this.State = State;
@@ -152,10 +156,10 @@ MGUI.prototype.Submenu = function (State, Bind) {
 	}
 	for (let i = State, l = 4; i < l; i++) if (!Skip.has(i) && MGUI.Filter[State].includes(i)) for(let i2 = 0, o2 = Object.keys(Menu[i]), l2 = o2.length; i2 < l2; i2++) if(!Recipt.includes(o2[i2])) {
 		if (Menu[i][o2[i2]] !== null) this.Workspace.appendChild(Menu[i][o2[i2]]);
-		for (let i3 = i + 1; i3 < 4; i3++) if(!Skip.has(i3) && o2[i2] in Menu[i3]) this.Workspace.appendChild(Menu[i3][o2[i2]]);
+		for (let i3 = i + 1; i3 < 4; i3++) if(!Skip.has(i3) && MGUI.Filter[State].includes(i3) && o2[i2] in Menu[i3]) this.Workspace.appendChild(Menu[i3][o2[i2]]);
 		Recipt.push(o2[i2]);
 	}
-	if (State == 0)for(let i = 0, l = Menu[4].length; i < l; i++)this.Workspace.appendChild(Menu[4][i]);
+	if (State == 0) for (let i = 0, l = Menu[4].length; i < l; i++) this.Workspace.appendChild(Menu[4][i]);
 	return true;
 }
 MGUI.Menu = function(NN, NA, CN, CA, XX) {
@@ -199,6 +203,11 @@ MGUI.Menu.prototype.Adjust = function (State, Key, Options) {
 		action.setAttribute('tabindex','0');
 		action.setAttribute('onkeyup', 'if(event.key==\'Enter\')this.click()');
 		action.addEventListener('click', E => this.Parent.Submenu(State + n, true));
+		let keybinds = document.createElement('div');
+		keybinds.setAttribute('class', 'MGUI-Action-Keybinds');
+		keybinds.innerHTML = MGUI.Keybinds[State]+`<div class="MGUI-Action-Keybind">${Key}</div></div>`;
+		header.appendChild(keybinds);
+
 	} else if ('Function' in Options) {
 		action.Function = Options.Function;
 		action.setAttribute('class', 'MGUI-Action MGUI-Button');
