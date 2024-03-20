@@ -135,7 +135,7 @@ File.prototype.Node_Modify = function (Options, Node) {
 File.prototype.Node_Remove = function (Node) {
 	if (!Number.isInteger(Node)) Node = this.Data.indexOf(Node);
 	if (!this.Data[Node]) return false;
-	let Problem_Child = this.Data.splice(Node, 1);
+	let Problem_Child = this.Data.splice(Node, 1)[0];
 	this.Data.forEach(Node => Node.Children = Node.Children.filter(Child => Child != Problem_Child));
 	return true;
 }

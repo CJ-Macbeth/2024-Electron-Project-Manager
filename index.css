@@ -1,483 +1,613 @@
+/*
+
+green, red, and yellow are highlight colors - to be used minimally
+the main colors are shades from white to black
+
+*/
+
 :root {
-	--slide-color-1: #000;
-	--slide-color-2: #666;
-	--slide-background-1: #FFF;
-	--slide-background-2: #F8F8F8;
-	--slide-background-3: #CCC;
-	--slide-background-4: #AAA;
-	--slide-background-bad: #A66;
-	--slide-incomplete-background: #CCC;
-	--slide-incomplete-background-hover: #999;
-	--slide-complete-background: #333;
-	--slide-complete-background-hover: #000;
-	--slide-whiteboard-color: #558;
-	--slide-whiteboard-background: #EEE;
-	--slide-whiteboard-background-hover: #FFF;
-	--slide-link-color: white;
-	--slide-link-background: #666;
-	--slide-link-background-hover: black;
-	--slide-note-color: #025;
-	--slide-note-background: #DEF;
-	--slide-note-background-hover: #ABD;
-	--prompt-color: #090;
-	--prompt-color-hover: #060;
-	--prompt-background: #F0FFF0;
-	--prompt-background-hover: #CFC;
-	/*
-	--slide-incomplete-background: #FAA;
-	--slide-incomplete-background-hover: #A66;
-	--slide-complete-background: #AFA;
-	--slide-complete-background-hover: #6A6;
-	--title-color: black;
-	--statement-color: #666;
-	--title-background: white;
-	--periodicity-color: #009;
-	--periodicity-color-hover: #006;
-	--periodicity-background: #F0F0FF;
-	--periodicity-background-hover: #CCF;
-	--link-color: #906;
-	--link-color-hover: #603;
-	--link-background-1: #FFF0FA;
-	--link-background-2: #FFE7FA;
-	--link-background-hover: #FCE;
-	--child-color: #666;
-	--child-color-hover: white;
-	--child-background: white;
-	--child-background-hover: #999;
-	--note-color: #090;
-	--note-color-hover: #060;
-	--note-background: #F0FFF0;
-	--note-background-hover: #CFC;
-	 */
+	--shade-1: #000000;
+	--shade-2: #202020;
+	--shade-3: #404040;
+	--shade-4: #606060;
+	--shade-5: #808080;
+	--shade-6: #A0A0A0;
+	--shade-7: #C0C0C0;
+	--shade-8: #E0E0E0;
+	--shade-9: #FFFFFF;
+	--focus-1: #008800;
+	--focus-9: #86F66B;
+	--warn-9: #F6F66B;
+	--bad-9: #FF6666;
 }
 @font-face {
-	font-family: lt-superior;
-	src: url(LTSuperior-Regular.otf);
+	font-family: wave;
+	src: url(LTWaveAlt-Regular.otf);
 }
 @font-face {
 	font-family: ubuntu;
 	src: url(UbuntuMono-R.ttf);
 }
 html * {
-	font-family: lt-superior;
+	font-family: wave;
 }
 body::-webkit-scrollbar {
 	display: none;
 }
 body {
 	margin: 0;
+	overflow: hidden;
+	user-select: none;
+	background: var(--shade-2);
+}
+img {
+	user-drag: none;
+	-webkit-user-drag: none;
+}
+::-webkit-scrollbar {
+	width: .75rem;
+}
+::-webkit-scrollbar-button {
+	display: none;
+}
+::-webkit-scrollbar-thumb {
+	background: var(--shade-4);
+}
+::-webkit-scrollbar-track-piece {
+	background: var(--shade-3);
+}
+#Background {
+	position: fixed;
+	top: -5;
+	left: -5;
+	width: calc(100vw + 10px);
+	height: calc(100vh + 10px);
+	background: url("Forest Floor.png") repeat;
+	background-size: 500px;
+	filter: blur(4px);
 }
 #Workspace {
+	margin: 0;
 	position: relative;
 	left: 15rem;
 	display: inline-block;
 	width: calc(100vw - 15rem);
-	min-height: 100vh;
+	height: 100vh;
 	user-select: none;
-	background: #F6F6F6;
 }
-.Slide-Column {
-	display: inline-block;
-	vertical-align: top;
+.Symbol-Box {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+}
+.Symbol-Leaf {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	height: 150vh;
+	z-index: 1;
+}
+.Symbol {
+	height: 50vh;
+	z-index: 2;
+}
+.Tree-Column {
 	width: calc(100% / 3);
 	height: 100vh;
-	margin: 0;
-	border: 0;
-	outline: 0;
-	padding: 0;
-	background: var(--slide-background-3);
+	display: inline-block;
+	vertical-align: top;
+	overflow: hidden;
 }
-.Slide-Node-Box {
+.Tree-Active {
+	background: var(--shade-3);
+}
+.Tree-Node-Box {
+	padding: .5em;
+	border-radius: 1em 0 0 1em;
+}
+.Tree-Node {
 	font-size: 1rem;
-	background: var(--slide-background-3);
-	color: var(--slide-color-3);
-	padding: .5em;
-}
-.Slide-Node {
-	width: calc(100% - 1em);
+	width: calc(100% - 2em);
+	padding: 1em;
+	margin: 0;
+	background: var(--shade-8);
+	color: var(--shade-3);
 	border-radius: .5em;
-	padding: .5em;
-	background: var(--slide-background-1);
-	color: var(--slide-color-1);
-	box-shadow: .125em .125em .25em var(--slide-background-4);
+	box-shadow: .2rem .2rem .4rem var(--shade-2);
 }
-.Slide-Node-Bad {
-	color: white;
-	background: var(--slide-background-bad);
+.Tree-Node-Active {
+	background: var(--focus-9);
 }
-.Slide-Node-Header {
+.Tree-Node-Warn {
+	background: var(--bad-9);
+}
+.Tree-Node-Header {
 	display: flex;
 	align-items: center;
 }
-.Slide-Active {
-	background: var(--slide-background-2);
-	color: var(--slide-color-2);
-}
-.Slide-Active .Slide-Current {
-	margin: .5em 0 .5em 0;
-}
-.Slide-Checkbox {
+.Tree-Checkbox {
 	flex-shrink: 0;
 	font-size: inherit;
 	outline: none;
 	border: 0;
-	height: 1.25em;
-	width: 1.25em;
+	height: 1em;
+	width: 1em;
 	margin-right: .5em;
 }
-.Slide-Checkbox-Incomplete {
-	background: var(--slide-incomplete-background);
-	color: var(--slide-incomplete-background);
+.Tree-Incomplete {
+	background: var(--shade-6);
 }
-.Slide-Checkbox-Incomplete:hover {
-	background: var(--slide-incomplete-background-hover);
-	color: var(--slide-incomplete-background-hover);
+.Tree-Incomplete:hover {
+	background: var(--shade-4);
 }
-.Slide-Checkbox-Incomplete:focus {
-	background: var(--slide-incomplete-background-hover);
-	color: var(--slide-incomplete-background-hover);
+.Tree-Incomplete:focus {
+	background:var(--shade-4);
 }
-.Slide-Checkbox-Complete {
-	background: var(--slide-complete-background);
-	color: var(--slide-complete-background);
+.Tree-Complete {
+	background:var(--shade-1);
 }
-.Slide-Checkbox-Complete:hover {
-	background: var(--slide-complete-background-hover);
-	color: var(--slide-complete-background-hover);
+.Tree-Complete:hover {
+	background:var(--shade-3);
 }
-.Slide-Checkbox-Complete:focus {
-	background: var(--slide-complete-background-hover);
-	color: var(--slide-complete-background-hover);
+.Tree-Complete:focus {
+	background:var(--shade-3);
 }
-.Slide-Title {
-	flex-grow: 1;
-	font-size: 1.25em;
-	color: inherit;
-	text-align: left;
-}
-.Slide-Statement {
+.Tree-Statement {
 	color: inherit;
 	white-space: pre-wrap;
 	margin: 0;
-	font-family: lt-superior;
-}
-.Slide-Notes {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: flex-start;
-	align-content: flex-start;
-	gap: .5em;
-	padding: .5em;
-}
-.Slide-Note {
 	font-family: ubuntu;
-	color: var(--slide-note-color);
-	background: var(--slide-note-background);
-	white-space: pre-wrap;
-	padding: .5em;
-	margin: 0;
-	box-shadow: .25em .25em .5em var(--slide-background-4);
-	border-radius: .25em;
+	font-size: .8rem;
 }
-.Slide-Note:focus {
-	outline: none;
-	border: 0;
-	background: var(--slide-note-background-hover);
-}
-.Slide-Note:hover {
-	outline: none;
-	border: 0;
-	background: var(--slide-note-background-hover);
-}
-.Slide-Whiteboard {
-	font-size: 1rem;
-	text-align: center;
-	margin: .25rem .5rem;
-	white-space: normal;
-	word-wrap: break-word;
-	width: calc(100% - 1.5rem);
-	font-family: ubuntu;
-	outline: none;
-	border: 0;
-	padding: .25rem;
-	border-radius: .25rem;
-	color: var(--slide-whiteboard-color);
-	background: var(--slide-whiteboard-background);
-}
-.Slide-Whiteboard:hover {
-	outline: none;
-	border: 0;
-	background: var(--slide-whiteboard-background-hover);
-}
-.Slide-Whiteboard:focus {
-	outline: none;
-	border: 0;
-	background: var(--slide-whiteboard-background-hover);
-}
-.Slide-Link {
-	font-size: .75rem;
-	margin: .25rem .5rem;
-	white-space: normal;
-	word-wrap: break-word;
-	width: calc(100% - 1.5rem);
+.Tree-Link {
+	word-break: break-all;
 	text-align:left;
 	font-family: ubuntu;
 	outline: none;
 	border: 0;
-	padding: .25rem;
-	color: var(--slide-link-color);
-	background: var(--slide-link-background);
-}
-.Slide-Link:hover {
-	outline: none;
-	border: 0;
-	background: var(--slide-link-background-hover);
-}
-.Slide-Link:focus {
-	outline: none;
-	border: 0;
-	background: var(--slide-link-background-hover);
-}
-/*.Title-Card {
-	width: calc(100% - 3rem);
-	margin: 1rem;
-	background: var(--title-background);
-	padding: .5rem;
-	box-shadow: .25rem .25rem .5rem lightgrey;
-}
-h1 {
-	display: inline;
-	font-size: 2rem;
-	color: var(--title-color);
-	padding: 0;
-	margin: 0;
-}
-.Periodicity-Button {
-	font-size: inherit;
-	outline: none;
-	border: 0;
-	height: 1.5em;
-	width: 1.5em;
-	margin-right: .5em;
-}
-.Incomplete {
-	background: var(--slide-incomplete-background);
-	color: var(--slide-incomplete-background);
-}
-.Incomplete:hover {
-	background: var(--slide-incomplete-background-hover);
-	color: var(--slide-incomplete-background-hover);
-}
-.Incomplete:focus {
-	background: var(--slide-incomplete-background-hover);
-	color: var(--slide-incomplete-background-hover);
-}
-.Complete {
-	background: var(--slide-complete-background);
-	color: var(--slide-complete-background);
-}
-.Complete:hover {
-	background: var(--slide-complete-background-hover);
-	color: var(--slide-complete-background-hover);
-}
-.Complete:focus {
-	background: var(--slide-complete-background-hover);
-	color: var(--slide-complete-background-hover);
-}
-.Statement {
-	margin: 0;
-	font-family: monospace;
-	font-size: .75rem;
-	color: var(--statement-color);
-}
-.Periodicity-Box {
-	margin: .5rem 0 .5rem 0;
-}
-.Periodicity-Box * {
-	padding: .5rem;
-	background: var(--periodicity-background);
-	color: var(--periodicity-color);
-	display: inline-block;
-}
-.Links {
-	width: calc(100% - 2rem);
-	margin: 1rem;
+	color: var(--focus-9);
+	border-radius: .25em;
+	text-decoration: underline;
+	width: calc(100% - 1rem);
+	margin: .5rem;
 	margin-top: 0;
-	margin-bottom: .5rem;
-	text-align: center;
-	border: none;
-	border-collapse: collapse;
-	box-shadow: .25rem .25rem .5rem lightgrey;
-}
-.Links tr {
-	background: var(--link-background-1);
-}
-.Links tr:nth-child(even) {
-	background: var(--link-background-2);
-}
-.Links td {
-	border: none;
-	border-collapse: collapse;
-	padding: 0;
-}
-.Links td {
-	background: inherit;
-}
-.Link {
-	font-family: monospace;
-	font-size: .75rem;
-	background: inherit;
-	outline: none;
-	border: 0;
-	margin: 0;
-	padding: .5em;
-	display: block;
-	width: 100%;
-	text-align: left;
-	word-break: break-all;
-	color: var(--link-color);
-}
-.Link:hover {
-	color: var(--link-color-hover);
-	background: var(--link-background-hover);
-}
-.Link:focus {
-	outline: none;
-	background: var(--link-background-hover);
-	color: var(--link-color-hover);
-}
-.Link.Focus {
-	outline: none;
-	background: var(--link-background-hover);
-	color: var(--link-color-hover);
-}
-.Children {
-	display: inline-block;
-	width: calc(50% - 1.5rem);
-	margin: 1rem;
-	margin-top: 0;
-	margin-right: 0;
-}
-.Children:only-child {
-	display: block;
-	width: calc(100% - 2rem);
-	margin: 0 1rem 0 1rem;
-}
-.Child {
-	display: block;
-	border: none;
-	outline: none;
-	text-align: left;
-	padding: 0;
-	margin: 0 0 .25rem 0;
-	width: 100%;
-	color: var(--child-color);
-	font-family: monospace;
 	background: #0000;
 }
-.Child .Title {
-	width: calc(100% - 2rem);
-	display: inline-block;
-	border: none;
-	outline: none;
-	text-align: left;
-	padding: .5rem;
-	margin: 0 0 .25rem 0;
-	background: var(--child-background);
-}
-.Child .Title:first-child {
-	width: 100%;
-}
-.Child .Button {
-	width: 2rem;
-	display: inline-block;
-	border: none;
-	outline: none;
-	text-align: left;
-	padding: .5rem;
-	margin: 0 0 .25rem 0;
-}
-.Child .Title:hover {
-	outline: none;
-	color: var(--child-color-hover);
-	background: var(--child-background-hover);
-}
-.Child .Title:focus {
-	outline: none;
-	color: var(--child-color-hover);
-	background: var(--child-background-hover);
-}
-.Child .Title.Focus {
-	outline: none;
-	color: var(--child-color-hover);
-	background: var(--child-background-hover);
-}
-.Child .Periodicity-Button.Incomplete:hover {
-	background: var(--slide-incomplete-background);
-}
-.Child .Periodicity-Button.Incomplete:focus {
-	background: var(--slide-incomplete-background);
-}
-.Child .Periodicity-Button.Complete:focus {
-	background: var(--slide-complete-hover);
-}
-.Child .Periodicity-Button.Complete:hover {
-	background: var(--slide-complete-hover);
-}
-.Notes {
-	vertical-align: top;
-	display: inline-flex;
-	justify-content: flex-start;
-	align-items: flex-start;
-	align-content: flex-start;
-	gap: .5rem;
-	width: calc(50% - 1rem);
-	margin: 1rem;
-	margin-top: 0;
-	margin-left: .5rem;
-}
-.Notes:only-child {
-	width: calc(100% - 2rem);
-	margin: 0 1rem 0 1rem;
-}
-.Note-Button {
+.Tree-Link:hover {
 	outline: none;
 	border: 0;
-	padding: .5rem;
-	text-align: left;
-	color: var(--note-color);
-	background: var(--note-background);
-	box-shadow: .25rem .25rem .5rem lightgrey;
+	color: var(--shade-9);
 }
-.Note-Button:hover {
+.Tree-Link:focus {
 	outline: none;
 	border: 0;
-	color: var(--note-color-hover);
-	background: var(--note-background-hover);
+	color: var(--shade-9);
 }
-.Note-Button:focus {
-	outline: none;
-	border: 0;
-	color: var(--note-color-hover);
-	background: var(--note-background-hover);
-}
-.Note-Button.Focus {
-	outline: none;
-	border: 0;
-	color: var(--note-color-hover);
-	background: var(--note-background-hover);
-}
-.Note {
+.Tree-Sketch {
+	width: calc(100% - 1rem);
 	margin: 0;
-	text-align: left;
-}*/
+	aspect-ratio: 1 / 1;
+	position: relative;
+	padding: .5rem;
+}
+.Sketch {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: transparent;
+}
+.Tree-Sketch .Sketch {
+	width: calc(100% - 1rem);
+	height: calc(100% - 1rem);
+	top: .5rem;
+	left: .5rem;
+}
+.Tree-Log {
+	font-size: .75rem;
+	margin: .5rem;
+	white-space: pre-wrap;
+	width: calc(100% - 1rem);
+	color: var(--focus-9);
+}
+.Task-Column {
+  direction: rtl;
+	width: 50%;
+	height: 100%;
+	overflow-y: auto;
+	display: inline-block;
+	position: relative;
+}
+.Task-Column * {
+	direction: ltr;
+}
+.Task-Header {
+	display: flex;
+	font-size: 1.5rem;
+	align-items: center;
+	word-break: break-word;
+	text-align:left;
+	outline: none;
+	border: 0;
+	padding: .5rem;
+	margin: .5rem;
+	margin-bottom: 0;
+	width: calc(100% - 2rem);
+	color: var(--shade-1);
+	background: var(--shade-7);
+}
+.Task-Header .Tree-Incomplete {
+	background: var(--shade-6);
+}
+.Task-Header .Tree-Incomplete:hover {
+	background: var(--shade-4);
+}
+.Task-Header .Tree-Incomplete:focus {
+	background: var(--shade-4);
+}
+.Task-Header .Tree-Complete {
+	background: var(--shade-1);
+}
+.Task-Header .Tree-Complete:hover {
+	background: var(--shade-3);
+}
+.Task-Header .Tree-Complete:focus {
+	background: var(--shade-3);
+}
+.Task-Statement {
+	white-space: pre-wrap;
+	word-break: break-all;
+	text-align:left;
+	font-family: ubuntu;
+	outline: none;
+	border: 0;
+	padding: .5rem;
+	padding-top: 0;
+	font-size: .8rem;
+	margin: .5rem;
+	margin-top: 0;
+	margin-bottom: 0;
+	width: calc(100% - 2rem);
+	color: var(--shade-1);
+	background: var(--shade-7);
+}
+.Task-Link {
+	word-break: break-all;
+	text-align:left;
+	font-family: ubuntu;
+	outline: none;
+	border: 0;
+	text-decoration: underline;
+	padding: .5em;
+	font-size: .75rem;
+	margin: .5rem;
+	margin-top: 0;
+	margin-bottom: 0;
+	width: calc(100% - 1rem);
+	color: var(--shade-1);
+	background: var(--shade-7);
+}
+.Task-Link:hover {
+	outline: none;
+	border: 0;
+	color: var(--focus-1);
+}
+.Task-Link:focus {
+	outline: none;
+	border: 0;
+	color: var(--focus-1);
+}
+.Task-Checklist {
+	margin: .5rem;
+	margin-top: 0;
+	width: calc(100% - 1.125rem);
+	background: var(--shade-3);
+	color: var(--shade-7);
+	border: .0625em solid var(--shade-7);
+}
+.Task-Checklist-Row {
+	display: flex;
+	align-items: center;
+}
+.Task-Checkbox {
+	width: 1.25rem;
+	height: 1.25rem;
+	flex-shrink: 0;
+	padding: .125em;
+	border: .0625em solid var(--shade-7);
+}
+.Task-Incomplete:hover {
+	background:var(--shade-6);
+	outline: none;
+}
+.Task-Incomplete:focus {
+	background:var(--shade-6);
+	outline: none;
+}
+.Task-Complete {
+	background: var(--shade-7);
+}
+.Task-Complete:hover {
+	background: var(--shade-6);
+	outline: none;
+}
+.Task-Complete:focus {
+	background: var(--shade-6);
+	outline: none;
+}
+.Task-Checklist-Item {
+	border: .0625em solid var(--shade-7);
+	padding: .125em;
+	overflow: hidden;
+	height: 1.25rem;
+	text-overflow: ellipsis;
+	flex-grow: 1;
+	white-space: nowrap
+}
+.Task-Checklist-Item:focus {
+	color: var(--focus-9);
+	outline: 0;
+}
+.Task-Checklist-Item:hover {
+	color: var(--focus-9);
+}
+.Task-Checklist-Box {
+	border: .125em solid var(--shade-4);
+}
+.Task-Log {
+	width: calc(100% - 1rem);
+	color: var(--focus-9);
+	white-space: pre-wrap;
+	margin: .5rem;
+	font-size: .75rem;
+}
+.Kanban-Board {
+	overflow-x: scroll;
+	white-space: nowrap;
+	height: 100vh;
+}
+.Kanban-Column {
+	display: inline-block;
+	position: relative;
+	vertical-align: top;
+}
+.Kanban-Tasklist {
+	width: calc(50vw - 7.5rem);
+}
+.Kanban-Sketch {
+	height: calc(100vh - 1rem);
+	aspect-ratio: 1 / 1;
+}
+.Kanban-Stage {
+	width: 20rem;
+	margin: .5rem;
+	margin-left: 0;	
+}
+.Kanban-Stage-Title {
+	width: calc(100% - 1em);
+	font-size: 1.25rem;
+	padding: .5em;
+	text-align: center;
+	color: white; /* hard-coded bacause bkg is determined in program */
+}
+.Kanban-Item {
+	width: calc(100% - 1rem);
+	margin-top: .5rem;
+	padding: .5rem;
+	background: var(--shade-6);
+	color: var(--shade-1);
+	border-radius: .25rem;
+}
+.Kanban-Item:focus {
+	background: var(--shade-8);
+	outline: none;
+}
+.Kanban-Item:hover {
+	background: var(--focus-9);
+}
+.Kanban-Focus {
+	background: var(--focus-9);
+}
+.Kanban-Header {
+	display: flex;
+	align-items: center;
+}
+.Kanban-Statement {
+	color: inherit;
+	white-space: pre-wrap;
+	margin: 0;
+	margin-top: .5em;
+	font-family: ubuntu;
+	font-size: .8rem;
+}
+.Kanban-Checkbox {
+	width: 1rem;
+	height: 1rem;
+	flex-shrink: 0;
+	padding: .125em;
+	margin-right: .5rem;
+}
+.Kanban-Incomplete {
+	background: var(--shade-7);
+}
+.Kanban-Incomplete:hover {
+	background:var(--shade-5);
+	outline: none;
+}
+.Kanban-Incomplete:focus {
+	background:var(--shade-5);
+	outline: none;
+}
+.Kanban-Complete {
+	background: var(--shade-1);
+}
+.Kanban-Complete:hover {
+	background: var(--shade-2);
+	outline: none;
+}
+.Kanban-Complete:focus {
+	background: var(--shade-2);
+	outline: none;
+}
+.Logbook {
+	display: inline-block;
+	position: relative;
+	top: 50%;
+	left: 50%;
+	width: 80%;
+	height: 80%;
+	transform: translate(-50%,-50%);
+	background: var(--shade-3);
+	overflow-y: scroll;
+}
+.Log-Entry {
+	margin: 1rem;
+	color: var(--shade-9);
+	width: calc(100% - 2rem);
+}
+.Log-Entry:hover {
+	color: var(--focus-9);
+}
+.Log-Entry:focus {
+	outline: 0;
+	color: var(--focus-9);
+}
+.Search-Box {
+	position: fixed;
+	top: 0;
+	right: 0;
+	width: calc(100% - 15rem);
+	height: 100vh;
+	background: #0006;
+	z-index: 2;
+}
+.Search-Result {
+	display: inline-block;
+	position: relative;
+	top: 50%;
+	left: 50%;
+	width: 80%;
+	height: 80%;
+	transform: translate(-50%,-50%);
+	background: var(--shade-9);
+	overflow-y: scroll;
+}
+.Search-Head {
+	margin: .5em;
+	padding: .5em;
+	background: var(--shade-8);
+	color: var(--shade-4);
+	border-radius: .5em;
+}
+.Search-Head:hover {
+	background: var(--shade-4);
+	color: var(--shade-8);
+}
+.Search-Table {
+	width: calc(100% - 2rem);
+	margin: 1rem;
+	border-spacing: .5rem;
+}
+.Search-Item-Head {
+	display: flex;
+	align-items: center;
+}
+.Search-Title {
+	color: var(--shade-5);
+}
+.Search-Checkbox {
+	flex-shrink: 0;
+	font-size: inherit;
+	outline: none;
+	border: .0512rem solid var(--shade-5);
+	height: .6em;
+	width: .6em;
+	margin-right: .5em;
+}
+.Search-Incomplete {
+	background: var(--shade-9);
+}
+.Search-Complete {
+	background: var(--shade-5);
+}
+.Search-Statement {
+	color: var(--shade-5);
+	font-size: .75rem;
+}
+.Search-Item:hover {
+	border: 0;
+	outline: 0;
+	color: var(--focus-1);
+}
+.Search-Item:hover .Search-Checkbox {
+	border: .0512rem solid var(--focus-1);
+}
+.Search-Item:hover .Search-Checkbox.Search-Complete {
+	background: var(--focus-1);
+}
+.Search-Item:hover .Search-Title {
+	color:var(--focus-1);
+}
+.Search-Item:hover .Search-Statement {
+	color: var(--focus-1);
+}
+.Search-Item:focus {
+	border: 0;
+	outline: 0;
+	color: var(--focus-1);
+}
+.Search-Item:focus .Search-Checkbox {
+	border: .0512rem solid var(--focus-1);
+}
+.Search-Item:focus .Search-Checkbox.Search-Complete {
+	background: var(--focus-1);
+}
+.Search-Item:focus .Search-Title {
+	color:var(--focus-1);
+}
+.Search-Item:focus .Search-Statement {
+	color: var(--focus-1);
+}
+.Tab {
+	margin: 1rem;
+	font-size: 1.25rem;
+	padding: .5rem;
+	border: 0;
+	outline: 0;
+	width: calc(100% - 2rem);
+	background: var(--shade-7);
+	color: var(--shade-1);
+	border-radius: .25rem;
+	margin-bottom: 0;
+}
+.Tab:last-child {
+	margin-bottom: 1rem;
+}
+.Tab:focus {
+	outline: 0;
+	color: var(--focus-1);
+	background: var(--shade-8);
+}
+.Tab:hover {
+	outline: 0;
+	color: var(--focus-1);
+	background: var(--shade-8);
+}
 .Prompt-Background {
 	position: fixed;
 	top: 0;
 	right: 0;
 	width: calc(100vw - 15rem);
 	height: 100vh;
-	background: #0006;	
+	background: #0006;
+	z-index: 2;
 }
 .Prompt-Box {
 	display: inline-block;
@@ -485,47 +615,42 @@ h1 {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%,-50%);
-	background: white;
+	background: var(--shade-9);
 	border-radius: .5rem;
 	padding: 1rem;
+}
+.Prompt-Box.Prompt-Flex {
+	display: inline-flex;
+	align-items: center;
 }
 .Prompt-Text {
 	outline: none;
 	border: 0;
+	color: var(--shade-6);
 }
-/*
-.Periodicity-Select {
-	font-family: monospace;
-	outline: 0;
-	border: 0;
-	padding: .5rem;
-	font-size: 1rem;
-	border-radius: .5rem 0 0 .5rem;
-	color: var(--periodicity-color-hover);
-	background: var(--periodicity-background-hover);
-}
-.Periodicity-Select:focus{
-	outline: 0;
-	border: 0;
-	padding: .5rem;
-	background: var(--periodicity-color-hover);
-	color: white;
-}
-.Periodicity-Input {
-	font-family: monospace;
-	border-radius: 0 .5rem .5rem 0;
-	outline: none;
-	padding: .5rem;
-	border: 0;
-	color: var(--periodicity-color);
-	background: var(--periodicity-background);
-	font-size: 1rem;
-}
-.Periodicity-Input:focus {
+.Prompt-Text:focus {
 	outline: none;
 	border: 0;
+	color: var(--focus-1);
 }
-*/
+.Prompt-Text:hover {
+	outline: none;
+	border: 0;
+	color: var(--focus-1);
+}
+.Prompt-Color {
+	outline: none;
+	border: 0;
+	height: 2rem;
+	width: 2rem;
+	margin-right: 1rem;
+}
+.Prompt-Color:focus {
+	outline: none;
+}
+.Prompt-Color:hover {
+	outline: none;
+}
 .Prompt-Raw {
 	display: block;
 	width: 25rem;
@@ -533,87 +658,64 @@ h1 {
 	outline: none;
 	border: 0;
 	overflow: auto;
-	background: var(--prompt-background);
-	color: var(--prompt-color);
+	background: var(--shade-6);
+	color: var(--shade-9);
 	border-radius: .5rem;
 	padding: .5rem;
+	font-family: ubuntu;
 }
 .Prompt-Raw:focus {
 	outline: none;
-	background: var(--prompt-background-hover);
-	color: var(--prompt-color-hover);
+	background: var(--focus-1);
+	color: var(--shade-9);
 }
 .Prompt-Raw:hover {
 	outline: none;
-	background: var(--prompt-background-hover);
-	color: var(--prompt-color-hover);
+	background: var(--focus-1);
+	color: var(--shade-9);
 }
 .Prompt-Button {
 	outline: none;
 	border: 0;
 	margin: .5rem;
 	padding: .5rem;
-	background: var(--prompt-background);
-	color: var(--prompt-color);
+	border-radius: .25rem;
+	background: var(--shade-6);
+	color: var(--shade-9);
 }
 .Prompt-Button:hover {
 	outline: none;
 	border: 0;
-	background: var(--prompt-background-hover);
-	color: var(--prompt-color-hover);
+	background: var(--focus-1);
+	color: var(--shade-9);
 }
 .Prompt-Button:focus {
 	outline: none;
 	border: 0;
-	background: var(--prompt-background-hover);
-	color: var(--prompt-color-hover);
+	background: var(--focus-1);
+	color: var(--shade-9);
 }
-/*#Menu-Virtual {
-	display: inline-block;
-	margin: 0;
-	padding: 0;
-	width: 15rem;
-	height: 100vh;
-}*/
 #Menu {
 	user-select: none;
 	font-size: .75rem;
 	width: 15rem;
 	height: 100vh;
-	background: #EEE;
+	background: var(--shade-2);
 	position: fixed;
 	z-index: 1;
 	top: 0;
 	left: 0;
-	box-shadow: 1px 0 5px #666;
+	box-shadow: 1px 0 5px var(--shade-1);
 }
 .MGUI-Action {
 	width: 19.5em;
-	background: #999;
+	background: var(--shade-3);
 	padding: .25em;
 	word-break: break-word;
 	border-bottom: 1px solid #EEE;
+	border-bottom: 1px solid var(--shade-1);
 	text-align: right;
 	/* break word */
-}
-.MGUI-Button {
-	background: #666;
-}
-.MGUI-Button:focus .MGUI-Action-Name {
-	color: #666;
-}
-.MGUI-Button:focus .MGUI-Action-Description {
-	color: #666;
-}
-.MGUI-Button:hover {
-	color: #666;
-	background: white;
-}
-.MGUI-Button:hover .MGUI-Action-Name {
-	color: #666;
-}
-.MGUI-Button:hover .MGUI-Action-Description {
-	color: #666;
 }
 .MGUI-Glow-True {
 	animation: .25s 1 glowtrue;
@@ -623,23 +725,23 @@ h1 {
 }
 @keyframes glowtrue {
 	50% {
-		background: #6F6;
+		background: var(--focus-9);
 	}
 }
 @keyframes glowfalse {
 	50% {
-		background: #F66;
+		background: var(--bad-9);
 	}
 }
 .MGUI-Button:focus {
-	color: #666;
 	background: white;
+	background: var(--shade-white);
 	outline: none;
 }
 .MGUI-Action-Name {
 	display: inline-block;
 	padding: .25em;
-	color: white;
+	color: var(--shade-5);
 	float: left;
 }
 .MGUI-Action-Name:only-child {
@@ -655,17 +757,85 @@ h1 {
 .MGUI-Action-Keybinds {
 	display: inline-block;
 	padding: .25em;
-	color: #CCC;
-}
-.MGUI-Action:hover .MGUI-Action-Keybinds {
-	color: #666;
+	color: var(--shade-4);
 }
 .MGUI-Action-Keybind {
+	color: inherit;
 	display: inline-block;
 	margin-left: .5em;
 }
 .MGUI-Action-Description {
 	margin: .5em;
-	color: #DDD;
+	color: var(--shade-3);
 	text-align: left;
 }
+.MGUI-Button {
+	background: var(--shade-4);
+}
+.MGUI-Button .MGUI-Action-Name {
+	color: var(--shade-9);
+}
+.MGUI-Button .MGUI-Action-Description {
+	color: var(--shade-9);
+}
+.MGUI-Button .MGUI-Action-Keybinds {
+	color: var(--shade-2);
+}
+.MGUI-Button:focus {
+	color: var(--shade-1);
+	background: var(--focus-9);
+}
+.MGUI-Button:hover {
+	color: var(--shade-1);
+	background: var(--focus-9);
+}
+.MGUI-Button:hover .MGUI-Action-Name {
+	color: var(--focus-1);
+}
+.MGUI-Button:focus .MGUI-Action-Name {
+	color: var(--focus-1);
+}
+.MGUI-Button:hover .MGUI-Action-Description {
+	color: var(--shade-2);
+}
+.MGUI-Button:focus .MGUI-Action-Description {
+	color: var(--shade-2);
+}
+.MGUI-Button:focus .MGUI-Action-Keybinds {
+	color: var(--shade-4);
+}
+.MGUI-Button:hover .MGUI-Action-Keybinds {
+	color: var(--shade-4);
+}
+/*:root {
+	--shade-black: black;
+	--shade-white: white;
+	--shade-grey-1: #23221D; 
+	--shade-grey-2: #3B3E31; 
+	--shade-grey-3: #585A49; 
+	--shade-grey-4: #ACADA4; 
+	--shade-red-1: #D36F64; 
+	--shade-red-2: #AF6154; 
+	--shade-red-3: #8B5343; 
+	--shade-red-4: #674532; 
+	--shade-yellow-1: #E8EF60;
+	--shade-yellow-2: #BFC151;
+	--shade-yellow-3: #969341;
+	--shade-yellow-4: #6D6531;
+	--shade-green-1: #CBE2A3;
+	--shade-green-2: #96C446;
+	--shade-green-3: #5E7228;
+	--shade-green-4: #424919;
+	--shade-green-5: #343412;
+	--shade-green-6: #1F1D0B;
+	--shade-main-1: #000;
+	--shade-main-2: #000;
+	--shade-main-3: #000;
+	--shade-main-4: #000;
+	--shade-background-1: #000;
+	--shade-background-2: #000;
+	--shade-background-3: #000;
+	--shade-background-4: #000;
+	--shade-highlight-1: #000;
+	--shade-highlight-2: #000;
+}*/

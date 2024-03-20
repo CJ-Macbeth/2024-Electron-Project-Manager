@@ -1,4 +1,4 @@
-var GUI, My_File;
+var GUI, My_Edit, My_View;
 const Menu_Boilerplate = [{}, {}, {
 	'n': {
 		Name: 'New File',
@@ -20,9 +20,7 @@ const Menu_Boilerplate = [{}, {}, {
 const Menu = new MGUI.Menu(...Menu_Boilerplate);
 const init = async function () {
 	GUI = new MGUI(document.getElementById('Menu'));
-	//GUI.Navigate(Menu);
 	let Data = await IPC.File_Load();
-	//My_File = new File(document.getElementById('Workspace'), Data, GUI, Menu_Boilerplate);
-	My_File = new File(Data);
-	My_Tab = new Tab(My_File, document.getElementById('Workspace'), GUI);
+	My_Edit = new Edit(Data);
+	My_View = new View(My_Edit, document.getElementById('Workspace'), GUI);
 }

@@ -19,6 +19,7 @@ const File_Open = async function (Path) {
 	window.setMenuBarVisibility(false);
 	window.loadFile('application.html');
 	window.webContents.on('will-navigate', E => E.preventDefault());
+	return true;
 }
 const File_Save = async function (Path, Data) {
 	let File = Data.map(Node => JSON.stringify(Node)).join('\n');
@@ -52,7 +53,7 @@ async function init() {
 		else return await electron.dialog.showSaveDialog({
 			title: 'Create a New Project File'
 		}).then(async R => {
-			if (R.cancelled) return IPC_Response(false);
+			if (R.canceled) return IPC_Response(false);
 			else return File_New(Extension(R.filePath,'epm24',true)).then(File_Open).then(IPC_Response);
 		}).catch(E => {
 			return IPC_Response(E, true);
@@ -66,11 +67,16 @@ async function init() {
 			properties: ['multiSelections'],
 			filters: [{name: 'Project File', extensions: ['epm24']}]
 		}).then(async R => {
-			if (R.cancelled) return IPC_Response(false);
-			let Paths = R.filePaths.map(File_Open);
-			await Promise.all(Paths);
-			if (Paths.every(Path => Path == true)) return IPC_Response(true);
-			else return IPC_Response(false);
+			if (R.canceled) return IPC_Response(false);
+			let Errors = [];
+			let Paths = R.filePaths.map(File_Path => File_Open(File_Path).catch(e => {
+				Errors.push(e);
+				return false;
+			}));
+			return await Promise.allSettled(Paths).then(Results => {
+				if (Results.every(Result => Result.value == true)) return IPC_Response(true);
+				else return IPC_Response(Errors, true);
+			});
 		}).catch(E => {
 			return IPC_Response(E, true);
 		});

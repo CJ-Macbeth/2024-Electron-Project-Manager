@@ -55,7 +55,13 @@ const MGUI = function (Workspace) {
 	action.appendChild(name);
 	action.Function = () => { this.State > 0 ? this.Submenu(0) : this.Navigate(false)};
 	action.setAttribute('tabindex', '0');
-	action.setAttribute('onkeypress', 'if(event.key==\'Enter\')this.click()');
+	let suspend = () => this.Suspended = true;
+	action.addEventListener('keypress', function (event) {
+		if (event.key == 'Enter') {
+			this.click();
+			suspend();
+		}
+	});
 	action.addEventListener('click', action.Function);
 	let keybinds = document.createElement('div');
 	keybinds.setAttribute('class', 'MGUI-Action-Keybinds');
@@ -118,6 +124,7 @@ MGUI.prototype.Relocate = function (Workspace) {
 }
 MGUI.prototype.Navigate = function (Menu, Reset) {
 	this.Suspended = true;
+	if (Array.isArray(Menu)) Menu = new MGUI.Menu(...Menu);
 	if (Menu === false) {
 		Menu = this.Chain.pop();
 		delete Menu.Parent;
@@ -137,17 +144,18 @@ MGUI.prototype.Submenu = function (State, Bind) {
 	this.State = State;
 	this.Workspace.innerHTML='';
 	if (!('Escape' in Menu[0]) && this.Chain.length > 1 || (Bind && State > 0)) this.Workspace.appendChild(this.Escape);
+	if ('Escape' in Menu[0]) this.Workspace.appendChild(Menu[0].Escape);
 	let Hide = [];
 	let Recipt = [];
 	let Skip = new Set();
-	if ((State == 0 || State == 2) && 'Alt' in Menu[State]) {
-		Hide.push('Alt');
-		Skip.add(1);
-		Skip.add(3);
-	}
 	if ((State == 0 || State == 1) && 'Control' in Menu[State]) {
 		Hide.push('Control');
 		Skip.add(2);
+		Skip.add(3);
+	}
+	if ((State == 0 || State == 2) && 'Alt' in Menu[State]) {
+		Hide.push('Alt');
+		Skip.add(1);
 		Skip.add(3);
 	}
 	for (let i = 0, l = Hide.length; i < l; i++) {
@@ -155,7 +163,7 @@ MGUI.prototype.Submenu = function (State, Bind) {
 		Recipt.push(Hide[i]);
 	}
 	for (let i = State, l = 4; i < l; i++) if (!Skip.has(i) && MGUI.Filter[State].includes(i)) for(let i2 = 0, o2 = Object.keys(Menu[i]), l2 = o2.length; i2 < l2; i2++) if(!Recipt.includes(o2[i2])) {
-		if (Menu[i][o2[i2]] !== null) this.Workspace.appendChild(Menu[i][o2[i2]]);
+		if (Menu[i][o2[i2]] !== null && !(o2[i2] == 'Escape' && i == 0)) this.Workspace.appendChild(Menu[i][o2[i2]]);
 		for (let i3 = i + 1; i3 < 4; i3++) if(!Skip.has(i3) && MGUI.Filter[State].includes(i3) && o2[i2] in Menu[i3]) this.Workspace.appendChild(Menu[i3][o2[i2]]);
 		Recipt.push(o2[i2]);
 	}
@@ -201,25 +209,26 @@ MGUI.Menu.prototype.Adjust = function (State, Key, Options) {
 		let n = (Key == 'Alt' ? 1 : (Key == 'Control' ? 2 : (Key == 'Shift' ? 4 : 0)));
 		action.setAttribute('class', 'MGUI-Action MGUI-Button');
 		action.setAttribute('tabindex','0');
-		action.setAttribute('onkeyup', 'if(event.key==\'Enter\')this.click()');
+		let suspend = () => this.Parent.Suspended = true;
+		action.addEventListener('keypress', function (event) {
+			if (event.key == 'Enter') {
+				this.click();
+				suspend();
+			}
+		});
 		action.addEventListener('click', E => this.Parent.Submenu(State + n, true));
-		let keybinds = document.createElement('div');
-		keybinds.setAttribute('class', 'MGUI-Action-Keybinds');
-		keybinds.innerHTML = MGUI.Keybinds[State]+`<div class="MGUI-Action-Keybind">${Key}</div></div>`;
-		header.appendChild(keybinds);
-
 	} else if ('Function' in Options) {
 		action.Function = Options.Function;
 		action.setAttribute('class', 'MGUI-Action MGUI-Button');
 		action.setAttribute('tabindex', '0');
 		action.setAttribute('onkeyup', 'if(event.key==\'Enter\')this.click()');
 		action.addEventListener('click', () => this.Parent.Mouth(action));
-		if (State != 4) {
-			let keybinds = document.createElement('div');
-			keybinds.setAttribute('class', 'MGUI-Action-Keybinds');
-			keybinds.innerHTML = MGUI.Keybinds[State]+`<div class="MGUI-Action-Keybind">${Key}</div></div>`;
-			header.appendChild(keybinds);
-		}
+	}
+	if (State != 4) {
+		let keybinds = document.createElement('div');
+		keybinds.setAttribute('class', 'MGUI-Action-Keybinds');
+		keybinds.innerHTML = MGUI.Keybinds[State]+`<div class="MGUI-Action-Keybind">${Key}</div></div>`;
+		header.appendChild(keybinds);
 	}
 	if ('Description' in Options) {
 		let description = document.createElement('div');
