@@ -10,7 +10,7 @@ const Menu_Boilerplate = [{}, {}, {
 	},
 	's': {
 		Name: 'Save File',
-		Function: () => IPC.File_Save(My_File.Export())
+		Function: () => My_File.Export().then(IPC.File_Save)
 	}
 }, {}, [{
 	Name: '2024 Electron Project Manager'
