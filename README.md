@@ -1,7 +1,7 @@
 # Formica Project Manager
 Create and manage .4mica project files composed of infinitely nestable nodes that represent individual projects tasks. Organize projects or project parts into nested checklists or Kanban boards. Associate tasks with files or URLs. Create notes for tasks in a scalable 2-dimensional sketch area. Keep track of a task's progress, concerns, and changes in its log.
 
-<img src="Images/Launcher.png" style="width:50%;" />
+<img src="Images/Launcher.png" style="width:100%;" />
 
 Why is it called Formica? Mostly because ants are cool. But also, you can think of an ant nest as a loose metaphor for the structure of a Formica project, organized into a series of many different rooms, connected by tunnels that associate one with the next, each performing some necessary function in service of the goals of the colony.
 
@@ -9,7 +9,7 @@ Why is it called Formica? Mostly because ants are cool. But also, you can think 
 Formica is designed to organize a single project in a project file.<br>
 In reality, because of the nesting nature of the project structure, any number of projects can be included into a single project file, if desired<br>
 
-<img src="Images/New-Project.png" style="width:50%;" />
+<img src="Images/New-Project.png" style="width:100%;" />
 
 Each project is composed entirely of Nodes.<br>
 Nodes are composed of:<br>
@@ -53,20 +53,20 @@ Nodes, in the end, are really just fancy nested checklists. But imagine composin
 Rather than displaying Nodes as Tasklists or Kanban boards by default, they're displayed as a tree, starting with the root element. You can navigate by clicking around, or by using the arrow key on the keyboard.
 Navigate to a Node and click Enter to view it as a Tasklist or Kanban board.
 
-<img src="Images/Tree-View-1.png" style="width:50%;" />
+<img src="Images/Tree-View-1.png" style="width:100%;" />
 
-<img src="Images/Tree-View-2.png" style="width:50%;" />
+<img src="Images/Tree-View-2.png" style="width:100%;" />
 
 Orphaned Nodes, those who were cut from their Parent Node and now have no Parent Nodes anywhere in the document, are displayed under the root Node, so that they are still accessible. Copy and paste them into other Nodes to get them back off of the main screen.
 
-<img src="Images/Orphan.png" style="width:50%;" />
+<img src="Images/Orphan.png" style="width:100%;" />
 
 After clicking Enter from the Tree on the Node you want to open, it opens as either a Tasklist, or a Kanban board.
 
 ## The Tasklist
 Tasklists display nodes a nested checklists. Tracked child Nodes and their tracked children are displayed in the upper list. Untrakced child nodes and their untracked children are displayed in the lower list.
 
-<img src="Images/Task-View.png" style="width:50%;" />
+<img src="Images/Task-View.png" style="width:100%;" />
 
 You can change the depth of the list using the menu or keybind. This effect is purely visual.
 
@@ -76,7 +76,7 @@ No, what you want is the *real* project management format. You want a Kanban boa
 
 Simply enter a Node, press Alt+m, and then select option 2, to convert your primitive little list into a **prime Kanban masterpiece**.
 
-<img src="Images/Kanban-View-2.png" style="width:50%;" />
+<img src="Images/Kanban-View-2.png" style="width:100%;" />
 
 Untracked child Nodes are considered Stages. They are displayed in order.
 
@@ -84,7 +84,7 @@ Their children are considered the board's tasks. Use the menu or keybinds to mov
 
 Tracked child nodes are sorted off to the side in a little tasklist of their own. Use this for tracking meta tasks or other things that may not necessarily fit so easily into the model of the Kanban board, yet still belong with the project.
 
-<img src="Images/Kanban-View-1.png" style="width:50%;" />
+<img src="Images/Kanban-View-1.png" style="width:100%;" />
 
 And finally, way off to the right of the board, is the sketch area. It's a little bigger in the Kanban view than the Tasklist view, but size doesn't matter much to the Sketch area.
 
@@ -95,11 +95,11 @@ The Sketch area and entries into a Node's Sketch have a pretty wide range of siz
 
 You can make some notes small.
 
-<img src="Images/Sketch-View-Small.png" style="width:50%;" />
+<img src="Images/Sketch-View-Small.png" style="width:100%;" />
 
 You can also make them big.
 
-<img src="Images/Sketch-View-Big.png" style="width:50%;" />
+<img src="Images/Sketch-View-Big.png" style="width:100%;" />
 
 Whatever floats your boat.
 
@@ -111,7 +111,7 @@ What then, for remote resources?
 ## The Links
 Save URLs or filepaths for quick and easy access to remote resources.
 
-<img src="Images/Links.png" style="width:50%;" />
+<img src="Images/Links.png" style="width:100%;" />
 
 Click a link to open the link menu, (where you can replace or reorder a Node's links), and click the option to use your computer's default program to open that link.
 
@@ -123,13 +123,13 @@ On the other hand, if you don't know what any of that means, and you just wanna 
 Periodically review the progress of your project or task using its Node's Log functionality.
 The most recent log is displayed under the Sketch in the Tree, and under the checklists in both Tasklists and Kanban boards.
 
-<img src="Images/Log-View.png" style="width:50%;" />
+<img src="Images/Log-View.png" style="width:100%;" />
 
 Press the menu option or keybind to enter a new log. Condsider starting it with the current date, as a best practice.
 
 Press the menu option or keybind to view the logbook in its entirety. Navigate, edit, or rearrange the previous logs as you see fit.
 
-<img src="Images/Logbook.png" style="width:50%;" />
+<img src="Images/Logbook.png" style="width:100%;" />
 
 ## Search
 The Tree navigation is very convenient, but still, you can't find that one Node you made a while ago. You know what it was called, but where did you put it?
@@ -137,7 +137,7 @@ Your project is starting to get really populated. It's hard to find those missin
 
 Just use the Search. Find that missing node by entering a string of text as a search query, and looking through every nested child Node of the currently selected Node that has a Title or Statement that matches it. (Search is not smart, it's just using regex, so don't use multiple keywords or search engine commands.)
 
-<img src="Images/Search.png" style="width:50%;" />
+<img src="Images/Search.png" style="width:100%;" />
 
 Click to enter the node, and then click Back in the menu to return to the Node you searched from.
 
@@ -146,6 +146,6 @@ Search doesn't return any information about who is a parent to the matched items
 ## Status
 Nodes, as previously stated, can be complete, incomplete, or untracked. This impacts how they are viewed in Tasklists and Kanban boards. Tracked Nodes should generally represent finite tasks, and untracked Nodes should generally represent indefinite tasks (or Kanban stages).
 
-<img src="Images/Tracking.png" style="width:50%;" />
+<img src="Images/Tracking.png" style="width:100%;" />
 
 Use the menu or keybinds to toggle between tracked and untracked, and between complete and incomplete for the tracked ones.
