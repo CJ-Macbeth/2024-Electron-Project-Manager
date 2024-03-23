@@ -59,7 +59,7 @@ Navigate to a Node and click Enter to view it as a Tasklist or Kanban board.
 
 Orphaned Nodes, those who were cut from their Parent Node and now have no Parent Nodes anywhere in the document, are displayed under the root Node, so that they are still accessible. Copy and paste them into other Nodes to get them back off of the main screen.
 
-<img src="Images/Orphans.png" style="width:50%;" />
+<img src="Images/Orphan.png" style="width:50%;" />
 
 After clicking Enter from the Tree on the Node you want to open, it opens as either a Tasklist, or a Kanban board.
 
