@@ -3,8 +3,8 @@
     "electron": "^29.1.0",
     "open": "^10.0.4"
   },
-  "name": "2024-electron-project-manager",
-  "description": "A simple Electron-based project manager. Projects made in this program are composed of infinitely nestable checklist nodes that represent individual tasks, subtasks, or subprojects, which can be associated with due dates or periodicities.",
+  "name": "formica",
+  "description": "Create and manage .4mica project files composed of infinitely nestable nodes that represent individual projects tasks. Organize projects or project parts into nested checklists or Kanban boards.",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -12,12 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CJ-Macbeth/2024-Electron-Project-Manager.git"
+    "url": "git+https://github.com/CJ-Macbeth/Formica.git"
   },
   "author": "CJ Macbeth",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/CJ-Macbeth/2024-Electron-Project-Manager/issues"
+    "url": "https://github.com/CJ-Macbeth/Formica/issues"
   },
-  "homepage": "https://github.com/CJ-Macbeth/2024-Electron-Project-Manager#readme"
+  "homepage": "https://github.com/CJ-Macbeth/Formica/#readme",
+  "devDependencies": {
+    "@electron-forge/cli": "^7.3.1"
+  }
 }
