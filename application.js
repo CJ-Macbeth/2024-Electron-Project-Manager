@@ -1,4 +1,7 @@
+window.addEventListener('error', Error_Object => {return View.Alert(Error_Object)});
+window.addEventListener('unhandledrejection', Error_Object => {return View.Alert(Error_Object.reason)});
 var GUI, My_Edit, My_View;
+var Error_Log = [];
 const Menu_Boilerplate = [{}, {}, {
 	'n': {
 		Name: 'New File',
@@ -10,7 +13,7 @@ const Menu_Boilerplate = [{}, {}, {
 	},
 	's': {
 		Name: 'Save File',
-		Function: () => My_File.Export().then(IPC.File_Save)
+		Function: () => My_Edit.Export().then(IPC.File_Save)
 	}
 }, {}, [{
 	Name: '2024 Electron Project Manager'

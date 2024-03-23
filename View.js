@@ -1,3 +1,25 @@
+// creating a process for error handling and reporting
+// final stop for error reporting is always:
+// -> logging the error and information out to the console, through main
+// -> alerting the user to the error
+//
+// how is the information of the error to be used by the user?
+// what are the types of errors that can occur in the system?
+// -> data movement errors -> causes data loss or prevents an operation
+// -> visual errors -> causes interaction and display errors
+// -> undetectable errors -> no recognizable effect to the user
+//
+// data-error: red message to user, with details
+// visual-error: yellow message to the user, with details
+// invisible-error: log the error out to the console silently
+//
+// for data-jeapordizing errors, offer to try to make a new temporary save file next to the original, just in case
+// for visual errors, offer to try to restart the View system
+// for all errors, log to main
+// for all errors, offer to export the error information to a file for later use
+//
+// how will silent errors be logged? don't use silent errors, catch and alert to all errors
+//
 const View = function (Edit, Container, GUI) {
 	this.Edit = Edit;
 	this.Container = Container;
@@ -94,7 +116,7 @@ View.prototype.Tree = async function (Current_Index, Current_Node) {
 				return await this.Draw();
 			}
 		});
-		this.Element({Parent: Header, Class: 'Tree-Title', In: Node.Title});
+		this.Element({Parent: Header, Class: 'Tree-Title', In: HTMLS(Node.Title)});
 		if (Full && Node.Statement) this.Element({Type: 'xmp', Parent: Item, Class: 'Tree-Statement', In: Node.Statement});
 		return Box;
 	}
@@ -103,7 +125,7 @@ View.prototype.Tree = async function (Current_Index, Current_Node) {
 	if (Parent) await Draw_Node(Last_Index, false).then(Element => Column_1.appendChild(Element));
 	await Draw_Node(Current_Index, null, true).then(Element => Column_1.appendChild(Element));
 	if (Current_Node.Links.length > 0) Current_Node.Links.forEach((Link, I) => {
-		this.Element({Parent: Column_1, Type: 'button', Class: 'Tree-Link', In: Link, Click: () => {
+		this.Element({Parent: Column_1, Type: 'button', Class: 'Tree-Link', In: HTMLS(Link), Click: () => {
 			let Menu = this.Menu_Template();
 			let Index = I;
 			this.Menu_Link(Menu, Current_Index, () => {return Index}, Link, New_Index => Index = New_Index);
@@ -150,7 +172,6 @@ View.prototype.Tree = async function (Current_Index, Current_Node) {
 		Menu[0].q = this.Menu_Complete(Current_Index, Current_Node.Complete);
 		Menu[0].f = this.Menu_Search(Current_Index, Current_Node);
 		Menu[0].b = this.Menu_Logbook(Current_Index, Current_Node);
-		Menu[0].t = this.Menu_Tabs();
 		this.GUI.Navigate(Menu, true);
 	}
 }
@@ -193,10 +214,10 @@ View.prototype.Task = async function (Current_Index, Current_Node) {
 			return await this.Draw();
 		}
 	});
-	this.Element({Parent: Header, Class: 'Task-Title', In: Current_Node.Title});
+	this.Element({Parent: Header, Class: 'Task-Title', In: HTMLS(Current_Node.Title)});
 	if (Current_Node.Statement) this.Element({Parent: Column_Left, Type: 'xmp', Class: 'Task-Statement', In: Current_Node.Statement});
 	Current_Node.Links.forEach((Link, I) => {
-		this.Element({Parent: Column_Left, Type: 'button', Class: 'Task-Link', In: Link,  Click: () => {
+		this.Element({Parent: Column_Left, Type: 'button', Class: 'Task-Link', In: HTMLS(Link),  Click: () => {
 			let Index = I;
 			let Menu = this.Menu_Template();
 			this.Menu_Link(Menu, Current_Index, () => {return Index}, Link, New_Index => Index = New_Index);
@@ -219,7 +240,7 @@ View.prototype.Task = async function (Current_Index, Current_Node) {
 					return await this.Draw();
 				}
 			});
-			this.Element({Parent: Row, Class: 'Task-Checklist-Item', In: Node.Title, Click: async () => {
+			this.Element({Parent: Row, Class: 'Task-Checklist-Item', In: HTMLS(Node.Title), Click: async () => {
 				return await this.Navigate(Index);
 			}, Attributes: {tabindex: '0'}, Listeners: {keydown: function (e) {
 				if (e.key == 'Enter') this.click();
@@ -232,13 +253,16 @@ View.prototype.Task = async function (Current_Index, Current_Node) {
 			}
 		}
 		let Depth_Explorer = async (Index, Chain2) => {
-			if (Chain.includes(Index)) return 1;
+			if (Chain2.includes(Index)) return 1;
 			let Node;
 			if (Index == Current_Index) Node = Current_Node;
 			else Node = await this.Edit.Node(Index);
 			if (Node.Children.length == 0) return 1;
 			Chain2.push(Index);
-			return Math.max(...Node.Children.map(Child => Depth_Explorer(Child, Chain2) + 1));
+			let Depths = [];
+			let l = Node.Children.length
+			for (let i = 0; i < l; i++) await Depth_Explorer(Node.Children[i], Chain2).then(Depth => Depths.push(Depth + 1));
+			return Math.max(...Depths);
 		}
 		Options.Max_Depth = await Depth_Explorer(Current_Index, []);
 		let Chain2 = [Current_Index];
@@ -274,12 +298,10 @@ View.prototype.Task = async function (Current_Index, Current_Node) {
 		Menu[0].q = this.Menu_Complete(Current_Index, Current_Node.Complete);
 		Menu[0].f = this.Menu_Search(Current_Index, Current_Node);
 		Menu[0].b = this.Menu_Logbook(Current_Index, Current_Node);
-		Menu[0].t = this.Menu_Tabs();
 		this.GUI.Navigate(Menu, true);
 	}
 }
 View.prototype.Kanban = async function (Current_Index, Current_Node) {
-
 	let Chain = this.Tab.get('Chain');
 	let Node_Options = this.Tab.get(Current_Index);
 	if (!Node_Options.Kanban) Node_Options.Kanban = Object.create(null);
@@ -318,10 +340,10 @@ View.prototype.Kanban = async function (Current_Index, Current_Node) {
 			return await this.Draw();
 		}
 	});
-	this.Element({Parent: Header, Class: 'Task-Title', In: Current_Node.Title});
+	this.Element({Parent: Header, Class: 'Task-Title', In: HTMLS(Current_Node.Title)});
 	if (Current_Node.Statement) this.Element({Parent: Column_Tasklist, Type: 'xmp', Class: 'Task-Statement', In: Current_Node.Statement});
 	Current_Node.Links.forEach((Link, I) => {
-		this.Element({Parent: Column_Tasklist, Type: 'button', Class: 'Task-Link', In: Link,  Click: () => {
+		this.Element({Parent: Column_Tasklist, Type: 'button', Class: 'Task-Link', In: HTMLS(Link),  Click: () => {
 			let Index = I;
 			let Menu = this.Menu_Template();
 			this.Menu_Link(Menu, Current_Index, () => {return Index}, Link, New_Index => Index = New_Index);
@@ -339,7 +361,7 @@ View.prototype.Kanban = async function (Current_Index, Current_Node) {
 				return await this.Draw();
 			}
 		});
-		this.Element({Parent: Row, Class: 'Task-Checklist-Item', In: Node.Title, Click: async () => {
+		this.Element({Parent: Row, Class: 'Task-Checklist-Item', In: HTMLS(Node.Title), Click: async () => {
 			return await this.Navigate(Node.Index);
 		}, Attributes: {tabindex: '0'}, Listeners: {keydown: function (e) {
 			if (e.key == 'Enter') this.click();
@@ -391,7 +413,7 @@ View.prototype.Kanban = async function (Current_Index, Current_Node) {
 					return await this.Draw();
 				}
 			});
-			this.Element({Parent: Header, Class: 'Kanban-Item-Title', In: Child.Title});
+			this.Element({Parent: Header, Class: 'Kanban-Item-Title', In: HTMLS(Child.Title)});
 			if (Child.Statement) this.Element({Parent: Item, Type: 'xmp', Class: 'Kanban-Statement', In: Child.Statement});
 		}
 	}
@@ -411,7 +433,7 @@ View.prototype.Kanban = async function (Current_Index, Current_Node) {
 	}
 	for (let i = 0, l = filtered.length; i < l; i++) {
 		let Stage = this.Element({Parent: Board, Class: ['Kanban-Column', 'Kanban-Stage']});
-		this.Element({Parent: Stage, Class: 'Kanban-Stage-Title', In: filtered[i].Title, Attributes: {style: `background:${colors[i]};`}});
+		this.Element({Parent: Stage, Class: 'Kanban-Stage-Title', In: HTMLS(filtered[i].Title), Attributes: {style: `background:${colors[i]};`}});
 		await Draw_Items(filtered[i], Stage);
 	}
 
@@ -450,7 +472,6 @@ View.prototype.Kanban = async function (Current_Index, Current_Node) {
 		Menu[0].q = this.Menu_Complete(Current_Index, Current_Node.Complete);
 		Menu[0].f = this.Menu_Search(Current_Index, Current_Node);
 		Menu[0].b = this.Menu_Logbook(Current_Index, Current_Node);
-		Menu[0].t = this.Menu_Tabs();
 		this.GUI.Navigate(Menu, true);
 	}
 }
@@ -688,9 +709,9 @@ View.prototype.Search = async function (Search) {
 		let Node = Index == Current_Index ? Current_Node : await this.Edit.Node(Index);
 		let Header = this.Element({Class: 'Search-Item-Head', In: [
 			Node.Complete === null ? null : this.Element({Class: ['Search-Checkbox', Node.Complete ? 'Search-Complete' : 'Search-Incomplete']}),
-			this.Element({Class: 'Search-Title', In: Node.Title})
+			this.Element({Class: 'Search-Title', In: HTMLS(Node.Title)})
 		]});
-		let Statement = Node.Statement ? this.Element({Class: 'Search-Statement', In: Node.Statement}) : null;
+		let Statement = Node.Statement ? this.Element({Type: 'xmp', Class: 'Search-Statement', In: Node.Statement}) : null;
 		let Cell_Box = this.Element({Class: 'Search-Item', In: [Header, Statement], Click: async () => {
 			return await this.Navigate(Index);
 		}, Attributes: {tabindex: '0'}, Listeners: {keydown: function (e) {
@@ -707,12 +728,22 @@ View.prototype.Search = async function (Search) {
 		this.GUI.Navigate(Menu, true);
 	}
 }
-View.prototype.Tabview = function () {
+View.prototype.Tabview = async function () {
+	// ensure called asynly
 	let Backdrop = this.Element({Parent: this.Container, Class: 'Prompt-Background'});
 	let Box = this.Element({Parent: Backdrop, Class: 'Search-Result'});
-	this.Tabs.forEach(Tab => this.Element({Parent: Box, Type: 'button', Class: 'Tab', In: Tab.get('Node').Title, Click: async () => {
-		return await this.Navigate(null, null, Tab);
-	}}));
+	for (let i = 0, l = this.Tabs.length; i < l; i++) {
+		let Node = await this.Edit.Node(this.Tabs[i].get('Node'));
+		this.Element({
+			Parent: Box,
+			Type: 'button',
+			Class: 'Tab',
+			In: HTMLS(Node.Title),
+			Click: () => {
+				this.Navigate(null, null, this.Tabs[i]);
+			}
+		});
+	}
 	let Menu = this.Menu_Template();
 	Menu[0].Escape = {
 		Name: 'Escape',
@@ -724,23 +755,6 @@ View.prototype.Tabview = function () {
 	}
 	this.Menu_File(Menu);
 	this.GUI.Navigate(Menu, true);
-}
-View.prototype.Element = function (Options) {
-	let Shell = document.createElement(Options.Type ? Options.Type : 'div');
-	if (typeof Options.Class == 'string') Shell.setAttribute('class', Options.Class);
-	else if(Array.isArray(Options.Class)) Options.Class.forEach(Class => Shell.classList.add(Class));
-	if (Options.Click) Shell.onclick = Options.Click;
-	if (Options.Listeners) for (let Key in Options.Listeners) Shell.addEventListener(Key, Options.Listeners[Key]);
-	if (Options.Attributes) for (let Key in Options.Attributes) Shell.setAttribute(Key, Options.Attributes[Key]);
-	if (typeof Options.In == 'string') Shell.innerHTML += Options.In;
-	else if (Options.In instanceof HTMLElement) Shell.appendChild(Options.In);
-	else if (Array.isArray(Options.In)) Options.In.filter(In => In !== null).forEach(In => {
-		if (In instanceof HTMLElement) Shell.appendChild(In);
-		else Shell.innerHTML += In;
-	});
-	if (Options.Value) Shell.value = Options.Value;
-	if (Options.Parent) Options.Parent.appendChild(Shell);
-	return Shell;
 }
 View.prototype.Prompt = function (Type, Value, Callback, After, Silent) {
 	let Exit_Function = async () => {
@@ -816,10 +830,11 @@ View.prototype.Menu_File = function (Menu) {
 	Menu[2].Escape = {
 		Name: 'Close File',
 		Function: () => this.GUI.Navigate([{}, {}, {}, {}, [{
-			Name: 'Abandon Changes and Close File',
+			Name: 'Abandon Unsaved Changes and Close File',
 			Function: () => window.close()
 		}]])
 	};
+	Menu[4].push({Name: IPC.File_Name});
 }
 View.prototype.Menu_Edit = async function (Menu, Index, Node, Parent, Last_Index) {
 	Menu[0].Alt = {Name: 'Edit'};
@@ -854,7 +869,7 @@ View.prototype.Menu_Edit = async function (Menu, Index, Node, Parent, Last_Index
 	Menu[1].t = {
 		Name: 'Edit Title',
 		Function: () => {
-			this.Prompt('Text', Node.Title, async Title => {
+			this.Prompt('Text', HTMLS(Node.Title), async Title => {
 				await this.Edit.Node_Modify({Title: Title}, Index);
 				return await this.Draw();
 			});
@@ -1033,7 +1048,7 @@ View.prototype.Menu_Link = function (Menu, Index, Link_Index, Link, Callback) {
 		Function: async () => {
 			let Node = await this.Edit.Node(Index);
 			let link_index = Index();
-			if (link_index > Node.Links.lenght - 1) {
+			if (link_index > Node.Links.length - 1) {
 				let new_index = await this.Edit.Link_Move(link_index, false, Index);
 				Callback(new_index);
 			}
@@ -1050,7 +1065,7 @@ View.prototype.Menu_Link = function (Menu, Index, Link_Index, Link, Callback) {
 	}
 }
 View.prototype.Menu_Tabs = function () {
-	return {Name: 'Tabs', Function: () => this.Tabview()};
+	return {Name: 'Navigate Tabs', Function: () => this.Tabview()};
 }
 View.prototype.Menu_Close_Tab = function () {
 	return {Name: 'Close Tab', Function: async () => {
@@ -1392,3 +1407,41 @@ View.prototype.Menu_Kanban_Item = async function (Kanban_Index, Parent_Index, No
 	}};
 	this.GUI.Navigate(Menu, true);
 }
+View.prototype.Element = Element_Template;
+View.Error = function (Message) {
+	this.message = Message;
+	this.stack = (new Error()).stack();
+}
+View.Error.prototype.name = 'View.js Visual Error';
+View.Alert = function (e) {
+	let Failed_Log = false;
+	let Severity = 'Error-Unknown';
+	let Log_Entry = 'Error at: ' + new Date().toISOString();
+	if (e.name) Log_Entry += '\n' + e.name;
+	if (e.message) Log_Entry += '\n' + e.message;
+	if (e.stack) Log_Entry += '\n' + e.stack;
+	Error_Log.push(Log_Entry);
+	if (e instanceof View.Error) Severity = 'Error-Warn';
+	else if (e instanceof Edit.Error) Severity = 'Error-Bad';
+	IPC.Error_Log(e.stack).catch(() => Failed_Log = true);
+	let Message = `<div class="Error-Background"><div class="Error ${Severity}">`;
+	if (e.name) Message += `<h1 class="Error-Header">${e.name}</h1>`;
+	if (e.message) Message +=`<h2 class="Error-Subheader">${e.message}</h2>`;
+	if (e.stack) Message += `<xmp class="Error-Stack">${e.stack}</xmp>`;
+	if (Failed_Log) Message += '<p class="Error-Failed-Log">Failed to log the error to the main process</p>';
+	if (e instanceof Edit.Error) Message += '<p class="Error-Action">Some data may have been lost or corrupted. If you haven\'t saved your progress in a while, click <button class="Error-Button" onclick="My_Edit.Export().then(IPC.File_Crash).then(() => this.parentNode.remove())">Save</button> to attempt to save the file at <b><i>filename</i>.4mica.crash</b>';
+	if (e instanceof View.Error) Message += '<p class="Error-Action">The problem may resolve after reloading the view area.</p>';
+	else Message += '<p class="Error-Action">Click <button class="Error-Button" onclick="My_View.Draw()">Reload</button> to attempt to reload the view area.</p>';
+	Message += '<p class="Error-Action">Click <button class="Error-Button" onclick="IPC.Error_Export(Error_Log).then(() => this.parentNode.remove())">Export</button> to export this error report at <b><i>filename</i>.4mica.<i>timestamp</i>.log</b></p>';
+
+	Message += '<p class="Error-Action">Click <button class="Error-Button" onclick="window.close()">Exit</button> to exit the program</p>';
+	Message += '</div></div>';
+	document.body.innerHTML = Message; 
+}
+class View_Error extends Error {
+	constructor (message) {
+		super(message);
+		this.name = 'Formica Visual Error';
+	}
+}
+View.Error = View_Error;

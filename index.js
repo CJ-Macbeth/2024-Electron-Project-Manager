@@ -6,13 +6,14 @@ const Extension = require(path.join(__dirname, 'Extension'));
 const File_Symbol = Symbol();
 
 const File_New = async function (Path) {
-	return await fsp.copyFile(path.join(__dirname, 'index.epm24'), Path).then(() => {return Path});
+	return await fsp.copyFile(path.join(__dirname, 'index.4mica'), Path).then(() => {return Path});
 }
 const File_Open = async function (Path) {
 	let window = new electron.BrowserWindow({webPreferences: {
+		additionalArguments: [Path],
 		nodeIntegration: false,
-		sandbox: true,
 		contextIsolation: true,
+		sandbox: false,
 		preload: path.join(__dirname, 'application.preload.js')
 	}});
 	window[File_Symbol] = Path;
@@ -20,18 +21,6 @@ const File_Open = async function (Path) {
 	window.loadFile('application.html');
 	window.webContents.on('will-navigate', E => E.preventDefault());
 	return true;
-}
-const File_Save = async function (Path, Data) {
-	let File = Data.map(Node => JSON.stringify(Node)).join('\n');
-	return await fsp.writeFile(Path, File).then(() => {return true});
-}
-const File_Load = async function (Path, Data) {
-	let File = await fsp.readFile(Path).then(File => {
-		return File.toString('utf8').split('\n').map(Line => {
-			try {return JSON.parse(Line)} catch (E) {return null}
-		})
-	});
-	return File;
 }
 
 const Link_Open = function (Link) {
@@ -47,6 +36,7 @@ const IPC_Response = function (Message, E) {
 }
 
 async function init() {
+	electron.ipcMain.handle('log:error', (E, e) => console.log(e));
 	electron.ipcMain.handle('file:new', async E => {
 		let File = electron.BrowserWindow.fromWebContents(E.sender)[File_Symbol];
 		if (!File) return IPC_Response('Failed to identify IPC sender', true);
@@ -54,7 +44,7 @@ async function init() {
 			title: 'Create a New Project File'
 		}).then(async R => {
 			if (R.canceled) return IPC_Response(false);
-			else return File_New(Extension(R.filePath,'epm24',true)).then(File_Open).then(IPC_Response);
+			else return File_New(Extension(R.filePath,'4mica',true)).then(File_Open).then(IPC_Response);
 		}).catch(E => {
 			return IPC_Response(E, true);
 		});
@@ -65,7 +55,7 @@ async function init() {
 		else return await electron.dialog.showOpenDialog({
 			title: 'Open an Existing Project File',
 			properties: ['multiSelections'],
-			filters: [{name: 'Project File', extensions: ['epm24']}]
+			filters: [{name: 'Project File', extensions: ['4mica']}]
 		}).then(async R => {
 			if (R.canceled) return IPC_Response(false);
 			let Errors = [];
@@ -78,20 +68,6 @@ async function init() {
 				else return IPC_Response(Errors, true);
 			});
 		}).catch(E => {
-			return IPC_Response(E, true);
-		});
-	});
-	electron.ipcMain.handle('file:save', async (E, Data) => {
-		let File = electron.BrowserWindow.fromWebContents(E.sender)[File_Symbol];
-		if (!File) return IPC_Response('Failed to identify IPC sender', true);
-		else return await File_Save(File, Data).then(IPC_Response).catch(E => {
-			return IPC_Response(E, true);
-		});
-	});
-	electron.ipcMain.handle('file:load', async E => {
-		let File = electron.BrowserWindow.fromWebContents(E.sender)[File_Symbol];
-		if (!File) return IPC_Response('Failed to identify IPC sender', true);
-		else return await File_Load(File).then(IPC_Response).catch(E => {
 			return IPC_Response(E, true);
 		});
 	});
@@ -124,4 +100,5 @@ async function init() {
 	window.webContents.on('will-navigate', E => E.preventDefault());
 	window[File_Symbol] = true;
 }
+//electron.Menu.setApplicationMenu(null);
 electron.app.whenReady().then(init);
