@@ -17,7 +17,7 @@ const File_Open = async function (Path) {
 		contextIsolation: true,
 		sandbox: false,
 		preload: path.join(__dirname, 'application.preload.js'),
-		icon: 'icon.png'
+		icon: path.join(__dirname, 'icon.png')
 	}});
 	window[File_Symbol] = Path;
 	window.setMenuBarVisibility(false);
@@ -101,7 +101,7 @@ async function init() {
 			sandbox: true,
 			contextIsolation: true,
 			preload: path.join(__dirname, 'launcher.preload.js'),
-			icon: 'icon.png'
+			icon: path.join(__dirname, 'icon.png')
 		}});
 		window.setMenuBarVisibility(false);
 		window.loadFile('launcher.html');

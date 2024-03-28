@@ -22,6 +22,7 @@ const Menu_Boilerplate = [{}, {}, {
 }]];
 const Menu = new MGUI.Menu(...Menu_Boilerplate);
 const init = async function () {
+	document.title = 'Formica ' + IPC.File_Title;
 	GUI = new MGUI(document.getElementById('Menu'));
 	let Data = await IPC.File_Load();
 	My_Edit = new Edit(Data);

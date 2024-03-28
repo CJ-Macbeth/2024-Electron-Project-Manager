@@ -33,6 +33,7 @@ electron.contextBridge.exposeInMainWorld('IPC', {
 		return true;
 	},
 	File_Name: Path,
+	File_Title: path.basename(Path),
 	File_Load: async () => {
 		return await fsp.readFile(Path).then(buff => v8.deserialize(buff));
 	},
