@@ -10,11 +10,12 @@ const File_New = async function (Path) {
 }
 const File_Open = async function (Path) {
 	let window = new electron.BrowserWindow({webPreferences: {
-		additionalArguments: [Path],
+		additionalArguments: ['--formica-file=' + Path],
 		nodeIntegration: false,
 		contextIsolation: true,
 		sandbox: false,
-		preload: path.join(__dirname, 'application.preload.js')
+		preload: path.join(__dirname, 'application.preload.js'),
+		icon: 'icon.png'
 	}});
 	window[File_Symbol] = Path;
 	window.setMenuBarVisibility(false);
@@ -89,16 +90,22 @@ async function init() {
 		let Done = Link_Open(Link)
 		return Done ? IPC_Response(Done) : IPC_Response(Done, false);
 	});
-	let window = new electron.BrowserWindow({webPreferences: {
-		nodeIntegration: false,
-		sandbox: true,
-		contextIsolation: true,
-		preload: path.join(__dirname, 'launcher.preload.js')
-	}});
-	window.setMenuBarVisibility(false);
-	window.loadFile('launcher.html');
-	window.webContents.on('will-navigate', E => E.preventDefault());
-	window[File_Symbol] = true;
+	if (process.argv.length > 2) {
+		let Paths = process.argv.slice(2);
+		for (let i = 0, l = Paths.length; i < l; i++) await File_Open(Paths[i]);
+	} else {
+		let window = new electron.BrowserWindow({webPreferences: {
+			nodeIntegration: false,
+			sandbox: true,
+			contextIsolation: true,
+			preload: path.join(__dirname, 'launcher.preload.js'),
+			icon: 'icon.png'
+		}});
+		window.setMenuBarVisibility(false);
+		window.loadFile('launcher.html');
+		window.webContents.on('will-navigate', E => E.preventDefault());
+		window[File_Symbol] = true;
+	}
 }
 //electron.Menu.setApplicationMenu(null);
 electron.app.whenReady().then(init);

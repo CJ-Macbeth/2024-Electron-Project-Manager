@@ -95,8 +95,9 @@ img {
 	height: 100vh;
 	display: inline-block;
 	vertical-align: top;
-	overflow: hidden;
+	overflow-y: auto;
 }
+.Tree-Column::-webkit-scrollbar{display:none}
 .Tree-Active {
 	background: var(--shade-3);
 }
@@ -391,6 +392,7 @@ img {
 	padding: .5em;
 	text-align: center;
 	color: white; /* hard-coded bacause bkg is determined in program */
+	white-space: pre-wrap;
 }
 .Kanban-Item {
 	width: calc(100% - 1rem);

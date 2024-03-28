@@ -20,11 +20,17 @@
 // Log_Move(Log_Index, Target, Index)
 // Log_Remove(Log_Index, Index)
 //
+// what to do:
+// -> change the save function: save as direct data
+// -> fix cut and paste
+// -> fix click to navigate tree
+// -> stop backup on cut
+// -> disable Menu
+//
 const Edit = function (Data) {
 	this.Increment = 0;
 	this.References = new Map();
-	this.Data = Data.map(Node => this.Node_Tool(Object.create(null), Node, true, true));
-	this.Data = this.Data.map(Node => this.Node_Tool({Children: Node.Children}, Node));
+	this.Data = Data.map(Node => this.Node_Tool({}, Node));
 }
 Edit.prototype.Identify_Node = function (Reference, Internal) {
 	if (Internal) {
@@ -38,15 +44,7 @@ Edit.prototype.Identify_Node = function (Reference, Internal) {
 	}
 }
 Edit.prototype.Export = async function () {
-	this.Data = this.Data.filter(Node => !!Node);
-	let Data = [...this.Data];
-	for (let i = 0, l = Data.length; i < l; i++) {
-		let Node = Data[i];
-		let Index = this.References.get(Node);
-		let Shell = await this.Node(Index);
-		Data[i] = Shell;
-	}
-	return Data;
+	return this.Data;
 }
 Edit.prototype.Node = async function (Index) {
 	let Node = this.Identify_Node(Index);
@@ -127,7 +125,7 @@ Edit.prototype.Child_Remove = async function (Child_Index, Index) {
 		Child_Index < 0 ||
 		Child_Index >= Node.Children.length
 	) throw new Edit.Error('Invalid Child_Index provided');
-	let Child = Node.Children.splice(Child_Index, 1);
+	let Child = Node.Children.splice(Child_Index, 1)[0];
 	return this.References.get(Child);
 }
 Edit.prototype.Link_Add = async function (Link, Index) {
@@ -173,7 +171,7 @@ Edit.prototype.Link_Remove = async function (Link_Index, Index) {
 		Link_Index < 0 ||
 		Link_Index >= Node.Links.length
 	) throw new Edit.Error('Invalid Link_Index provided');
-	let Link = Node.Links.splice(Link_Index, 1);
+	let Link = Node.Links.splice(Link_Index, 1)[0];
 	return Link;
 }
 Edit.prototype.Sketch_Add = async function (Options, Index) {	
@@ -245,7 +243,7 @@ Edit.prototype.Log_Remove = async function (Log_Index, Index) {
 		Log_Index < 0 ||
 		Log_Index >= Node.Log.length
 	) throw new Edit.Error('Invalid Log_Index provided');
-	let Log = Node.Log.splice(Log_Index, 1);
+	let Log = Node.Log.splice(Log_Index, 1)[0];
 	return Log;
 }
 Edit.prototype.Title_Tool = function () {
@@ -258,7 +256,7 @@ Edit.prototype.Node_Tool = function (Options, Base, Defaults, Ignore_Children, E
 	if (typeof Options.Title == 'string' && Options.Title.length > 0 && (Export || !Titles.includes(Options.Title))) Base.Title = Options.Title.trim();
 	else if (typeof Options.Title == 'string' && Options.Title.length > 0 && (!Export && Titles.includes(Options.Title))) {
 		Options.Title = Options.Title.trim() + ' ';
-		while (Titles.includes(Options.Title)) Options.Title += '*';
+		while (Titles.includes(Options.Title.trim())) Options.Title += '*';
 		Base.Title = Options.Title;
 	}
 	else if (Options.Title === null || (Defaults && !Base.Title)) Base.Title = 'UNNAMED';
@@ -269,8 +267,9 @@ Edit.prototype.Node_Tool = function (Options, Base, Defaults, Ignore_Children, E
 	else if (!Ignore_Children && Array.isArray(Options.Children)) Base.Children = Options.Children.map(Child => {
 		if (Number.isInteger(Child) && Child >= 0 && Child < this.Data.length) return this.Data[Child];
 		else if (this.Data.includes(Child)) return Child;
-		else throw new Edit.Error('Invalid Child Assignment');
-	});
+		else return null;
+		//else throw new Edit.Error('Invalid Child Assignment');
+	}).filter(Child => Child !== null);
 	else if (Defaults && !Array.isArray(Options.Children) && !Base.Children) Base.Children = [];
 	else if (!Defaults && !Array.isArray(Options.Children) && !Base.Children) throw new Edit.Error('Invalid Children provided');
 	if (

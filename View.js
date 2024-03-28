@@ -1,25 +1,3 @@
-// creating a process for error handling and reporting
-// final stop for error reporting is always:
-// -> logging the error and information out to the console, through main
-// -> alerting the user to the error
-//
-// how is the information of the error to be used by the user?
-// what are the types of errors that can occur in the system?
-// -> data movement errors -> causes data loss or prevents an operation
-// -> visual errors -> causes interaction and display errors
-// -> undetectable errors -> no recognizable effect to the user
-//
-// data-error: red message to user, with details
-// visual-error: yellow message to the user, with details
-// invisible-error: log the error out to the console silently
-//
-// for data-jeapordizing errors, offer to try to make a new temporary save file next to the original, just in case
-// for visual errors, offer to try to restart the View system
-// for all errors, log to main
-// for all errors, offer to export the error information to a file for later use
-//
-// how will silent errors be logged? don't use silent errors, catch and alert to all errors
-//
 const View = function (Edit, Container, GUI) {
 	this.Edit = Edit;
 	this.Container = Container;
@@ -99,7 +77,7 @@ View.prototype.Tree = async function (Current_Index, Current_Node) {
 		let Box = this.Element({Class: 'Tree-Node-Box'});
 		let Item = this.Element({Parent: Box, Class: 'Tree-Node', Click: async () => {
 			if (Index == Current_Index) return;
-			else if (Node == Chain[Chain.length - 1]) return await this.Navigate(false);
+			else if (Index == Chain[Chain.length - 1]) return await this.Navigate(false);
 			else if (Sibling_Indexes.includes(Index)) return await this.Navigate(Index, true);
 			else return await this.Navigate(Index);
 		}});
@@ -142,7 +120,6 @@ View.prototype.Tree = async function (Current_Index, Current_Node) {
 		Class: 'Tree-Log',
 		In: Current_Node.Log[Current_Node.Log.length - 1]
 	});
-	if (Options.Position) Column_1.scrollTo(0, Options.Position);
 	let Target;
 	let Column_2 = this.Element({Parent: this.Container, Class: 'Tree-Column'});
 	for (let i = 0, l = Sibling_Indexes.length; i < l; i++) {
@@ -158,10 +135,17 @@ View.prototype.Tree = async function (Current_Index, Current_Node) {
 	let Column_3 = this.Element({Parent: this.Container, Class: ['Tree-Column', 'Tree-Active']});
 	if (!Chain.includes(Current_Index)) for (let i = 0, l = Current_Node.Children.length; i < l; i++) await Draw_Node(Current_Node.Children[i]).then(Element => Column_3.appendChild(Element));
 
+	if (Options.Position_1) Column_1.scrollTo(0, Options.Position_1);
+	if (Options.Position_2) Column_2.scrollTo(0, Options.Position_2);
+	if (Options.Position_3) Column_3.scrollTo(0, Options.Position_3);
 	Target.scrollIntoViewIfNeeded();
 	Target.focus();
 
-	this.Save = () => Options.Position = Column_1.scrollTop;
+	this.Save = () => {
+		Options.Position_1 = Column_1.scrollTop;
+		Options.Position_2 = Column_2.scrollTop;
+		Options.Position_3 = Column_3.scrollTop;
+	}
 
 	if (!this.Tab.get('Menulock')) {
 		let Menu = this.Menu_Template();
@@ -459,7 +443,8 @@ View.prototype.Kanban = async function (Current_Index, Current_Node) {
 		Menu[0].Escape = this.Menu_Tree();
 		if (Chain.length > 0) Menu[0].ArrowLeft = this.Menu_Back();
 		this.Menu_File(Menu);
-		this.Menu_Edit(Menu, Current_Index, Current_Node, Parent, Last_Index);
+		if (filtered.length > 0) this.Menu_Edit(Menu, Current_Index, Current_Node, Parent, Last_Index, filtered[0]);
+		else this.Menu_Edit(Menu, Current_Index, Current_Node, Parent, Last_Index);
 		Menu[0].i = {
 			Name: 'Navigate Items',
 			Function: async () => {
@@ -582,7 +567,7 @@ View.prototype.Sketch = async function (Index, Node, Parent) {
 		let X = Session.X.minus(0);
 		let Y = Session.Y.minus(0);
 		let Xt = new BigNumber(Width).div(Scale).plus(X);
-		let Yt = new BigNumber(Height).div(Scale).plus(X);
+		let Yt = new BigNumber(Height).div(Scale).plus(Y);
 		Session.Candidates = Node.Sketch
 			.filter(Item => (X.lte(Item.X) && Xt.gt(Item.X) && Y.lte(Item.Y) && Yt.gt(Item.Y)))
 			.map(Item => Node.Sketch.indexOf(Item));
@@ -689,12 +674,11 @@ View.prototype.Logbook = async function (Index, Node) {
 	Draw_Function();
 }
 View.prototype.Search = async function (Search) {
-	if (!Search || Search.trim().length == 0) return;
-	else Search = Search.trim();
+	if (!Search || Search.length == 0) return;
 	let Current_Index = this.Tab.get('Node');
 	let Current_Node = await this.Edit.Node(Current_Index);
 	let Options = this.Tab.get(Current_Node);
-	let Elements = await this.Edit.Node_Search(Search, Infinity, Current_Index);
+	let Elements = await this.Edit.Node_Search(new RegExp(Search, 'gi'), Infinity, Current_Index);
 	let Chain = [];
 	let Box = this.Element({Parent: this.Container, Class: 'Search-Box'});
 	let Result = this.Element({Parent: Box, Class: 'Search-Result'});
@@ -713,6 +697,7 @@ View.prototype.Search = async function (Search) {
 		]});
 		let Statement = Node.Statement ? this.Element({Type: 'xmp', Class: 'Search-Statement', In: Node.Statement}) : null;
 		let Cell_Box = this.Element({Class: 'Search-Item', In: [Header, Statement], Click: async () => {
+			this.Tab.set('Menulock', false);
 			return await this.Navigate(Index);
 		}, Attributes: {tabindex: '0'}, Listeners: {keydown: function (e) {
 			if (e.key == 'Enter') this.click();
@@ -720,7 +705,6 @@ View.prototype.Search = async function (Search) {
 		let Cell = this.Element({Type: 'td', In: Cell_Box});
 		this.Element({Parent: Table, Type: 'tr', In: Cell});
 	}
-	Draw_Match(Current_Index);
 	Elements.forEach(Element => Draw_Match(Element));
 	if (!this.Tab.get('Menulock')) {
 		let Menu = this.Menu_Template();
@@ -729,7 +713,6 @@ View.prototype.Search = async function (Search) {
 	}
 }
 View.prototype.Tabview = async function () {
-	// ensure called asynly
 	let Backdrop = this.Element({Parent: this.Container, Class: 'Prompt-Background'});
 	let Box = this.Element({Parent: Backdrop, Class: 'Search-Result'});
 	for (let i = 0, l = this.Tabs.length; i < l; i++) {
@@ -836,18 +819,24 @@ View.prototype.Menu_File = function (Menu) {
 	};
 	Menu[4].push({Name: IPC.File_Name});
 }
-View.prototype.Menu_Edit = async function (Menu, Index, Node, Parent, Last_Index) {
+View.prototype.Menu_Edit = async function (Menu, Index, Node, Parent, Last_Index, Kanban_Child) {
 	Menu[0].Alt = {Name: 'Edit'};
-	Menu[1].Enter = {
-		Name: 'New Child',
-		Function: () => {
-			this.Prompt('Text', null, async Title => {
-				let Child_Index = await this.Edit.Node_Add({Title: Title, Complete: false});
-				await this.Edit.Child_Add(Child_Index, Index);
-				return await this.Draw();
-			});
-		}
-	};
+	Menu[1].Enter = {Name: 'New Child'}
+	if (Number.isInteger(Kanban_Child)) Menu[1].Enter.Function = () => {
+		this.Prompt('Text', null, async Title => {
+			let Child_Index = await this.Edit.Node_Add({Title: Title, Complete: Node.Complete});
+			await this.Edit.Child_Add(Child_Index, Kanban_Child);
+			return await this.Draw();
+		});
+	}
+	else Menu[1].Enter.Function = () => {
+		this.Prompt('Text', null, async Title => {
+			let Child_Index = await this.Edit.Node_Add({Title: Title, Complete: Node.Complete});
+			let New_Favorite = await this.Edit.Child_Add(Child_Index, Index);
+			this.Tab.get(Index).Favorite_Child = Child_Index;
+			return await this.Draw();
+		});
+	}
 	Menu[1].c = {
 		Name: 'Copy Element',
 		Function: () => {
@@ -858,8 +847,11 @@ View.prototype.Menu_Edit = async function (Menu, Index, Node, Parent, Last_Index
 	Menu[1].x = {Name: 'Cut Element'};
 	if (Parent) Menu[1].x.Function =  async () => {
 		let Parent = await this.Edit.Node(Last_Index);
-		this.Clipboard = await this.Edit.Child_Remove(Parent.Children.indexOf(Index), Last_Index);
-		return await this.Navigate(false);
+		let Child_Index = Parent.Children.indexOf(Index);
+		this.Clipboard  = await this.Edit.Child_Remove(Child_Index, Last_Index);
+		if (Parent.Children.length > 1 && Child_Index < Parent.Children.length - 1) this.Navigate(Parent.Children[Child_Index + 1], true);
+		else if (Parent.Children.length > 1) this.Navigate(Parent.Children[Parent.Children.length - 2], true);
+		else this.Navigate(false);
 	}
 	Menu[1].v = {Name: 'Paste Element'};
 	if (this.Clipboard !== null) Menu[1].v.Function = async () => {
@@ -869,7 +861,7 @@ View.prototype.Menu_Edit = async function (Menu, Index, Node, Parent, Last_Index
 	Menu[1].t = {
 		Name: 'Edit Title',
 		Function: () => {
-			this.Prompt('Text', HTMLS(Node.Title), async Title => {
+			this.Prompt('Text', Node.Title, async Title => {
 				await this.Edit.Node_Modify({Title: Title}, Index);
 				return await this.Draw();
 			});
@@ -924,14 +916,26 @@ View.prototype.Menu_Edit = async function (Menu, Index, Node, Parent, Last_Index
 		}
 	};
 	Menu[1].Delete = {Name: 'Delete'};
-	if (Index != 0) Menu[1].Delete.Function = () => this.GUI.Navigate([{Enter:{
-		Name:'Perminently Delete Node',
-		Function: async () => {
+
+	if (Index != 0) {
+		let Delete_Action = {Name: 'Perminently Delete Node'};
+		if (Parent) Delete_Action.Function = async () => {
+			let Parent = await this.Edit.Node(Last_Index);
+			let Child_Index = Parent.Children.indexOf(Index);
 			await this.Edit.Node_Remove(Index);
-			this.GUI.Navigate(false);
-			return await this.Navigate(false);
+			if (
+				Parent.Children.length > 1 &&
+				Child_Index < Parent.Children.length - 1
+			) this.Navigate(Parent.Children[Child_Index + 1], true);
+			else if (Parent.Children.length > 1) this.Navigate(Parent.Children[Parent.Children.length - 2], true);
+			else this.Navigate(false);
 		}
-	}}, {}, {}, {}, []]);
+		else Delete_Action.Function = async () => {
+			await this.Edit.Node_Remove(Index);
+			this.Navigate(false);
+		}
+		Menu[1].Delete.Function = () => this.GUI.Navigate([{Enter: Delete_Action}, {}, {}, {}, []]);
+	}
 }
 View.prototype.Menu_Search = function (Index, Node) {
 	let Shell = {Name: 'Search'};

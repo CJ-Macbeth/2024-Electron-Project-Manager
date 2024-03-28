@@ -2,7 +2,7 @@ const electron = require('electron');
 const v8 = require('v8');
 const fsp = require('fs').promises;
 const path = require('path');
-const Path = process.argv[process.argv.length - 1];
+const Path = [...process.argv].find(arg => arg.match(/--formica-file/)).split('=')[1];
 electron.contextBridge.exposeInMainWorld('IPC', {
 	Error_Log: async E => {
 		return await electron.ipcRenderer.invoke('log:error', E);
