@@ -107,5 +107,5 @@ async function init() {
 		window[File_Symbol] = true;
 	}
 }
-//electron.Menu.setApplicationMenu(null);
+electron.Menu.setApplicationMenu(null);
 electron.app.whenReady().then(init);

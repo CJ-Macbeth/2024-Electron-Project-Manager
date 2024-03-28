@@ -6,7 +6,7 @@
   },
   "name": "formica",
   "description": "Create and manage .4mica project files composed of infinitely nestable nodes that represent individual projects tasks. Organize projects or project parts into nested checklists or Kanban boards.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
