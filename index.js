@@ -3,6 +3,8 @@ const fsp = require('fs').promises;
 const electron = require('electron');
 const Extension = require(path.join(__dirname, 'Extension'));
 
+if (require('electron-squirrel-startup')) electron.app.quit();
+
 const File_Symbol = Symbol();
 
 const File_New = async function (Path) {
